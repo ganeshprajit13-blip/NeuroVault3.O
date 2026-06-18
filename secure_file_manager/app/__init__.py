@@ -18,9 +18,26 @@ def create_app():
     _load_env_file()
     app = Flask(__name__)
     app.config['SECRET_KEY'] = (os.environ.get('SECRET_KEY') or 'dev-secret-key').strip()
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///secure_files.db'
+    
+    # Database configuration - support both PostgreSQL (for Vercel) and SQLite (for local dev)
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        # PostgreSQL for Vercel/production
+        if database_url.startswith('postgres://'):
+            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # SQLite for local development
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///secure_files.db'
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
+    
+    # Use /tmp for Vercel serverless, otherwise use local uploads folder
+    if os.environ.get('VERCEL'):
+        app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+        os.makedirs('/tmp/uploads', exist_ok=True)
+    else:
+        app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
     app.config['MAX_CONTENT_LENGTH'] = int(os.environ.get('MAX_CONTENT_LENGTH', 100 * 1024 * 1024))  # 100MB default
     # Use LAN URL (e.g. http://192.168.1.10:5000) so QR codes / share links work on phones, not 127.0.0.1
     app.config['PUBLIC_BASE_URL'] = (os.environ.get('PUBLIC_BASE_URL') or '').rstrip('/')

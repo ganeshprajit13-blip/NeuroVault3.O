@@ -1,0 +1,9 @@
+.git
+.gitignore
+.env.local
+.env
+instance/
+__pycache__
+*.pyc
+app/uploads/*
+!app/uploads/.gitkeep

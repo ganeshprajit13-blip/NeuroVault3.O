@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Download Shared File</h2>
+        {% if requires_password %}
+        <form method="POST">
+            <div class="mb-3">
+                <label for="password" class="form-label">Enter Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Download</button>
+        </form>
+        {% else %}
+        <p>File is ready for download.</p>
+        <a href="{{ url_for('files.shared_download', share_link=share.share_link) }}" class="btn btn-success">Download Now</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+        <div class="alert alert-warning">
+            <h1 class="h4">Shared file can’t be downloaded</h1>
+            {% if reason == 'old_format' %}
+            <p>This file was encrypted with an <strong>older version</strong> of the app (keys no longer match). It cannot be decrypted anymore.</p>
+            <p class="mb-0"><strong>Fix:</strong> Ask the owner to <strong>delete</strong> this file from their dashboard, <strong>upload it again</strong>, then create a <strong>new share link</strong>.</p>
+            {% elif reason == 'missing' %}
+            <p>The encrypted file is <strong>missing on the server</strong> (moved or deleted disk file).</p>
+            <p class="mb-0">Ask the owner to upload the file again and send a new link.</p>
+            {% elif reason == 'decrypt' %}
+            <p>The file could not be decrypted (damaged data or wrong key).</p>
+            <p class="mb-0">Ask the owner to re-upload the file and share it again.</p>
+            {% elif reason == 'integrity' %}
+            <p>The file failed an integrity check (it may have been changed on disk).</p>
+            <p class="mb-0">Ask the owner to upload again.</p>
+            {% else %}
+            <p>Something went wrong while preparing the download.</p>
+            <p class="mb-0">Ask the owner to re-upload and create a new share.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

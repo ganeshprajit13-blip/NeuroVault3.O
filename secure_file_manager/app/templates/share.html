@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <h2 class="h4 mb-3">Share: {{ file.original_filename }}</h2>
+
+        {% if existing_share_url %}
+        <div class="card mb-4 border-primary">
+            <div class="card-body text-center text-md-start">
+                <h3 class="h6 text-primary mb-2">Share link — use on your phone</h3>
+                <p class="small text-muted mb-2">Tap the link or copy and paste into the phone browser (same Wi‑Fi as this PC).</p>
+                <a href="{{ existing_share_url }}" class="text-break d-block fw-medium mb-3">{{ existing_share_url }}</a>
+                <button type="button" class="btn btn-primary copy-link-btn" data-url="{{ existing_share_url }}">Copy link</button>
+                {% if local_unusable %}
+                <p class="text-danger small mt-3 mb-0 text-start">
+                    This URL uses <strong>localhost</strong>. Your phone cannot open it. Set the
+                    <code>PUBLIC_BASE_URL</code> environment variable to your computer’s LAN address (e.g.
+                    <code>http://192.168.1.10:5000</code>) and restart the server.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <h3 class="h6 text-muted">Create or replace share settings</h3>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="password" class="form-label">Password (optional)</label>
+                <input type="password" class="form-control" id="password" name="password">
+            </div>
+            <div class="mb-3">
+                <label for="expiry_hours" class="form-label">Expiry Hours</label>
+                <input type="number" class="form-control" id="expiry_hours" name="expiry_hours" value="24">
+            </div>
+            <div class="mb-3">
+                <label for="max_downloads" class="form-label">Max Downloads</label>
+                <input type="number" class="form-control" id="max_downloads" name="max_downloads" value="1">
+            </div>
+            <button type="submit" class="btn btn-primary">Create share link</button>
+        </form>
+        <p class="mt-3"><a href="{{ url_for('files.dashboard') }}">Back to Dashboard</a></p>
+    </div>
+</div>
+<script>
+document.querySelectorAll('.copy-link-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-url');
+        if (navigator.clipboard && url) {
+            navigator.clipboard.writeText(url).then(function () {
+                var t = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(function () { btn.textContent = t; }, 2000);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

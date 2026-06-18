@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center text-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <h2 class="h4 mb-3">QR — {{ file.original_filename }}</h2>
+        {% if local_unusable %}
+        <div class="alert alert-warning text-start">
+            This link points at <strong>localhost</strong>. Your phone cannot open that.
+            Set <code>PUBLIC_BASE_URL</code> to your PC’s Wi‑Fi address, e.g.
+            <code>http://192.168.1.10:5000</code>, then restart the app.
+        </div>
+        {% endif %}
+        <div class="mb-3 p-3 bg-white border rounded shadow-sm d-inline-block" style="max-width: 100%;">
+            <img
+                src="{{ url_for('files.qr_image', file_id=file.id) }}"
+                alt="QR code for share link"
+                class="img-fluid"
+                style="max-width: min(100%, 320px); height: auto; display: block; margin: 0 auto;"
+                width="320"
+                height="320"
+            >
+        </div>
+        <p class="small text-muted mb-1">Share link (tap on phone or copy)</p>
+        <p class="mb-2"><a href="{{ share_url }}" class="text-break d-inline-block text-start">{{ share_url }}</a></p>
+        <button type="button" class="btn btn-primary btn-sm mb-4 copy-link-btn" data-url="{{ share_url }}">Copy link</button>
+        <div>
+            <a href="{{ url_for('files.dashboard') }}" class="btn btn-outline-secondary">Back to dashboard</a>
+        </div>
+    </div>
+</div>
+<script>
+document.querySelectorAll('.copy-link-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-url');
+        if (navigator.clipboard && url) {
+            navigator.clipboard.writeText(url).then(function () {
+                btn.textContent = 'Copied!';
+                setTimeout(function () { btn.textContent = 'Copy link'; }, 2000);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
